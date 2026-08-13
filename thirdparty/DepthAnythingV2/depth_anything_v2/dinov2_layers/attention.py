@@ -9,6 +9,7 @@
 #   https://github.com/rwightman/pytorch-image-models/tree/master/timm/models/vision_transformer.py
 
 import logging
+import os
 
 from torch import Tensor
 from torch import nn
@@ -17,10 +18,14 @@ from torch import nn
 logger = logging.getLogger("dinov2")
 
 
+XFORMERS_ENABLED = os.environ.get("XFORMERS_DISABLED") is None
 try:
-    from xformers.ops import memory_efficient_attention, unbind, fmha
+    if XFORMERS_ENABLED:
+        from xformers.ops import memory_efficient_attention, unbind, fmha
 
-    XFORMERS_AVAILABLE = True
+        XFORMERS_AVAILABLE = True
+    else:
+        raise ImportError
 except ImportError:
     logger.warning("xFormers not available")
     XFORMERS_AVAILABLE = False
